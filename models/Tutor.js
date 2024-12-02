@@ -11,6 +11,7 @@ const TutorSchema = new mongoose.Schema({
   commitment: { type: String, required: true },
   additionalTutoring: { type: String },
   password: { type: String, required: true },
+  isVerified: { type: Boolean, default: false },
   otp: { type: String, required: true },
   otpExpiration: { type: Date, required: true },
 });

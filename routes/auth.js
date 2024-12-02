@@ -311,6 +311,51 @@ router.post("/verifyOtp", async (req, res) => {
   }
 });
 
+router.post("/verifyOtpTutor", async (req, res) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({ message: "Email and OTP are required." });
+  }
+
+  try {
+    // Find user by email
+    const tutor = await Tutor.findOne({ email });
+
+    if (!tutor) {
+      return res.status(404).json({ message: "tutor not found." });
+    }
+
+    // Check if the provided OTP matches the tutor's OTP
+    if (tutor.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP." });
+    }
+
+    // Check if the OTP is expired
+    if (new Date() > tutor.otpExpiration) {
+      return res.status(400).json({ message: "OTP has expired." });
+    }
+
+    // OTP is valid; generate JWT token
+    const token = jwt.sign({ tutorId: tutor._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token validity
+    });
+
+    // Update tutor: mark as verified and clear OTP fields
+    tutor.isVerified = true;
+
+    await tutor.save();
+
+    // Respond with a success message and token
+    res.status(200).json({
+      message: "OTP verified successfully.",
+      token,
+    });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
 router.post("/reset-password", async (req, res) => {
   const { email, newPassword } = req.body;
 
