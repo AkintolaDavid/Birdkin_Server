@@ -145,7 +145,9 @@ router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    // Search for the user in both User and Tutor collections
+    const user =
+      (await User.findOne({ email })) || (await Tutor.findOne({ email }));
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -166,6 +168,8 @@ router.post("/verify-otp", async (req, res) => {
 
     // Mark the user as verified and clear OTP data
     user.isVerified = true;
+    user.otp = null;
+    user.otpExpiration = null;
 
     // Save updated user
     await user.save();
