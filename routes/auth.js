@@ -221,6 +221,50 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+router.post("/logintutor", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the user exists
+    const tutor = await Tutor.findOne({ email });
+    if (!tutor) {
+      return res.status(404).json({ message: "Email is not registered" });
+    }
+
+    // Verify the password
+    const isPasswordValid = await bcrypt.compare(password, tutor.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Invalid Password" });
+    }
+
+    // Check if the tutor is verified
+    if (!tutor.isVerified) {
+      return res.status(400).json({
+        message: "Account not verified. Use forget passward to verify",
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ tutorId: tutor._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // Return success response
+    res.status(200).json({
+      message: "Sign in successful",
+      token,
+      tutor: {
+        id: tutor._id,
+        email: tutor.email,
+        fullName: tutor.fullName,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/send-otp", async (req, res) => {
   const { email } = req.body;
 
