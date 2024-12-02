@@ -145,9 +145,7 @@ router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
 
   try {
-    // Search for the user in both User and Tutor collections
-    const user =
-      (await User.findOne({ email })) || (await Tutor.findOne({ email }));
+    const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -168,8 +166,42 @@ router.post("/verify-otp", async (req, res) => {
 
     // Mark the user as verified and clear OTP data
     user.isVerified = true;
-    user.otp = null;
-    user.otpExpiration = null;
+
+    // Save updated user
+    await user.save();
+
+    res.status(200).json({ message: "OTP verified", token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/verify-otptutor", async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const user = await Tutor.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if OTP is correct and not expired
+    if (user.otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+    if (new Date() > user.otpExpiration) {
+      return res.status(400).json({ message: "OTP has expired" });
+    }
+
+    // OTP is valid, generate JWT token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // Mark the user as verified and clear OTP data
+    user.isVerified = true;
 
     // Save updated user
     await user.save();
@@ -313,6 +345,50 @@ router.post("/send-otp", async (req, res) => {
   }
 });
 
+router.post("/send-otptutor", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await Tutor.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate OTP and expiration
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiration = new Date(Date.now() + 10 * 60 * 1000); // Valid for 10 minutes
+
+    // Update user with OTP and expiration
+    user.otp = otp;
+    user.otpExpiration = otpExpiration;
+    await user.save();
+
+    // Send OTP via email (configure nodemailer correctly)
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}. It expires in 10 minutes.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: "OTP sent successfully." });
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+    res.status(500).json({ message: "Failed to send OTP." });
+  }
+});
+
 router.post("/verifyOtp", async (req, res) => {
   const { email, otp } = req.body;
 
@@ -410,6 +486,30 @@ router.post("/reset-password", async (req, res) => {
   try {
     // Find the user by email
     const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Hash the new password before saving it
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    // Respond with success
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Failed to reset password" });
+  }
+});
+router.post("/reset-passwordtutor", async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    // Find the user by email
+    const user = await Tutor.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
