@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Tutor = require("../models/Tutor");
 const nodemailer = require("nodemailer");
 
 const generateOtp = require("../utils/generateOtp"); // Ensure correct path
@@ -12,19 +13,22 @@ const router = express.Router();
 
 // Sign Up Route
 router.post("/signup", async (req, res) => {
-  const { fullName, email, phone, country, password } = req.body;
+  const {
+    fullName,
+    email,
+    school,
+    firstSubject,
+    specificHelp,
+    secondSubject,
+    intendedUniversity,
+    password,
+  } = req.body;
 
   try {
     // Check if email already exists
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ message: "Email already exists" });
-    }
-
-    // Check if the phone already exists
-    const existingPhone = await User.findOne({ phone });
-    if (existingPhone) {
-      return res.status(400).json({ message: "Phone number already exists" });
     }
 
     const otp = generateOtp();
@@ -35,8 +39,11 @@ router.post("/signup", async (req, res) => {
     const newUser = new User({
       fullName,
       email,
-      phone,
-      country,
+      school,
+      firstSubject,
+      specificHelp,
+      secondSubject,
+      intendedUniversity,
       password: hashedPassword,
       otp,
       otpExpiration,
@@ -54,6 +61,85 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+router.post("/signupTutor", async (req, res) => {
+  const {
+    fullName,
+    email,
+    university,
+    firstSubject,
+    firstgrade,
+    secondSubject,
+    secondgrade,
+    commitment,
+    additionalTutoring,
+
+    confirmPassword,
+    password,
+  } = req.body;
+
+  try {
+    // Validation checks
+    if (
+      !fullName ||
+      !email ||
+      !password ||
+      !university ||
+      !firstSubject ||
+      !firstgrade ||
+      !commitment ||
+      !secondSubject ||
+      !secondgrade ||
+      !additionalTutoring
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be filled." });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
+    }
+    const existingEmail = await Tutor.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate OTP
+    const otp = generateOtp();
+    const otpExpiration = new Date(Date.now() + 5 * 60 * 1000); // OTP valid for 5 minutes
+
+    // Save the Tutor
+    const newTutor = new Tutor({
+      fullName,
+      email,
+      university,
+      firstSubject,
+      firstgrade,
+      secondSubject,
+      secondgrade,
+      commitment,
+      additionalTutoring,
+
+      password: hashedPassword,
+      otp,
+      otpExpiration,
+    });
+
+    await newTutor.save();
+
+    // Send OTP
+    await sendOtp(email, otp);
+
+    res
+      .status(200)
+      .json({ message: "Tutor registered successfully. OTP sent to email." });
+  } catch (error) {
+    console.error("Error in signupTutor:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
 // OTP Verification Route
 router.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;

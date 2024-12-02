@@ -2,14 +2,59 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema(
   {
-    fullName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    phone: { type: String, required: true },
-    country: { type: String, required: true }, // Changed from countryCode to country
-    password: { type: String, required: true },
-    isVerified: { type: Boolean, default: false },
-    otp: { type: String, required: false, default: null }, // Allow null
-    otpExpiration: { type: Date, required: false, default: null },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    school: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    firstSubject: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    specificHelp: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    secondSubject: {
+      type: String,
+      trim: true, // Optional field, no "required" rule
+    },
+    intendedUniversity: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    otp: {
+      type: String,
+      required: true,
+    },
+    otpExpiration: {
+      type: Date,
+      required: true,
+    },
   },
   { timestamps: true }
 );
