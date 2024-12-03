@@ -18,7 +18,6 @@ const upload = multer({
   },
 });
 
-// Handle interaction submissions
 router.post("/", upload.single("file"), async (req, res) => {
   const { message, date, time, courseId } = req.body;
 
@@ -28,22 +27,26 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 
   try {
-    // Build the new message object
-    const newMessage = new Message({
-      courseId,
+    // Validate or convert courseId to ObjectId
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return res.status(400).json({ message: "Invalid courseId format." });
+    }
+
+    const interactionData = {
+      courseId: mongoose.Types.ObjectId(courseId),
       userMessage: message,
-      date: new Date(date),
+      date,
       time,
-      fileUrl: req.file ? req.file.path : null,
-    });
+      fileUrl: req.file ? path.join(__dirname, "../", req.file.path) : null,
+    };
 
-    // Save the message to the database
-    const savedMessage = await newMessage.save();
+    // Save to MongoDB
+    const Message = require("../models/Message"); // Ensure proper import of your schema
+    const savedMessage = await Message.create(interactionData);
 
-    res.status(201).json({
-      message: "Interaction submitted successfully!",
-      data: savedMessage,
-    });
+    res
+      .status(201)
+      .json({ message: "Interaction submitted successfully!", savedMessage });
   } catch (error) {
     console.error("Error saving interaction:", error);
     res.status(500).json({ message: "Failed to save interaction." });
