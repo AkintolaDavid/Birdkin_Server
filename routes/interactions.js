@@ -20,26 +20,21 @@ const upload = multer({
 });
 
 router.post("/", upload.single("file"), async (req, res) => {
-  const { message, date, time, courseId } = req.body;
+  const { message, courseName, file, date, time } = req.body;
 
   // Validate required fields
-  if (!message || !date || !time || !courseId) {
+  if (!message || !courseName || !date || !time) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
   try {
-    // Validate courseId
-    if (!mongoose.Types.ObjectId.isValid(courseId)) {
-      return res.status(400).json({ message: "Invalid courseId format." });
-    }
-
-    // Construct interaction data
+    // Construct interaction data with courseName instead of courseId
     const interactionData = {
-      courseId: mongoose.Types.ObjectId(courseId), // Convert to ObjectId
+      courseName, // Save courseName directly
       userMessage: message,
       date,
       time,
-      fileUrl: req.file ? req.file.path : null, // Save relative path
+      fileUrl: req.file ? req.file.path : null, // Save relative path for file
     };
 
     // Save to MongoDB
