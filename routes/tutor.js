@@ -3,7 +3,7 @@ const router = express.Router();
 const Tutor = require("../models/Tutor");
 
 // Endpoint to get all tutor emails
-router.get("/tutors", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const tutors = await Tutor.find({}, "email fullName"); // Return email and fullName
     res.json(tutors);
