@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const Message = require("../models/UserMessage"); // Adjust the path to where your schema is stored
 
 const router = express.Router();
 
@@ -18,27 +19,31 @@ const upload = multer({
 });
 
 // Handle interaction submissions
-router.post("/", upload.single("file"), (req, res) => {
+router.post("/", upload.single("file"), async (req, res) => {
   const { message, date, time, courseId } = req.body;
 
+  // Validate required fields
   if (!message || !date || !time || !courseId) {
     return res.status(400).json({ message: "All fields are required." });
   }
 
   try {
-    const interactionData = {
-      message,
-      date,
-      time,
+    // Build the new message object
+    const newMessage = new Message({
       courseId,
-      filePath: req.file ? path.join(__dirname, "../", req.file.path) : null,
-    };
+      userMessage: message,
+      date: new Date(date),
+      time,
+      fileUrl: req.file ? req.file.path : null,
+    });
 
-    console.log("Interaction received:", interactionData);
-    // Save interactionData to the database (MongoDB or another)
-    // Example: db.collection("interactions").insertOne(interactionData);
+    // Save the message to the database
+    const savedMessage = await newMessage.save();
 
-    res.status(201).json({ message: "Interaction submitted successfully!" });
+    res.status(201).json({
+      message: "Interaction submitted successfully!",
+      data: savedMessage,
+    });
   } catch (error) {
     console.error("Error saving interaction:", error);
     res.status(500).json({ message: "Failed to save interaction." });
