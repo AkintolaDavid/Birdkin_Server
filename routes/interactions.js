@@ -1,7 +1,8 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
-const Message = require("../models/UserMessage"); // Adjust the path to where your schema is stored
+const mongoose = require("mongoose");
+const Message = require("../models/Message"); // Correct import path for your schema
 
 const router = express.Router();
 
@@ -27,26 +28,27 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 
   try {
-    // Validate or convert courseId to ObjectId
+    // Validate courseId
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ message: "Invalid courseId format." });
     }
 
+    // Construct interaction data
     const interactionData = {
-      courseId: mongoose.Types.ObjectId(courseId),
+      courseId: mongoose.Types.ObjectId(courseId), // Convert to ObjectId
       userMessage: message,
       date,
       time,
-      fileUrl: req.file ? path.join(__dirname, "../", req.file.path) : null,
+      fileUrl: req.file ? req.file.path : null, // Save relative path
     };
 
     // Save to MongoDB
-    const Message = require("../models/Message"); // Ensure proper import of your schema
     const savedMessage = await Message.create(interactionData);
 
-    res
-      .status(201)
-      .json({ message: "Interaction submitted successfully!", savedMessage });
+    res.status(201).json({
+      message: "Interaction submitted successfully!",
+      savedMessage,
+    });
   } catch (error) {
     console.error("Error saving interaction:", error);
     res.status(500).json({ message: "Failed to save interaction." });
