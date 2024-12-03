@@ -2,7 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const mongoose = require("mongoose");
-const Message = require("../models/Message"); // Correct import path for your schema
+const Message = require("../models/UserMessage"); // Correct import path for your schema
 
 const router = express.Router();
 
