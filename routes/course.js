@@ -3,7 +3,6 @@ const router = express.Router();
 const Course = require("../models/Course");
 
 router.post("/", async (req, res) => {
-  // Route starts at '/'
   const { title, rating, lecturer, email, description, img, category, topics } =
     req.body;
 
@@ -12,7 +11,7 @@ router.post("/", async (req, res) => {
       title,
       rating,
       lecturer,
-      email,
+      email, // This email will now correspond to the selected tutor
       description,
       img,
       category,
