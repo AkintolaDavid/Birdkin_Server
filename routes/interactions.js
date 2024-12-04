@@ -20,7 +20,7 @@ const upload = multer({
 });
 
 router.post("/", upload.single("file"), async (req, res) => {
-  const { message, courseName, file, date, time } = req.body;
+  const { message, courseName, file, date, time, userID } = req.body;
 
   // Validate required fields
   if (!message || !courseName || !date || !time) {
@@ -34,6 +34,7 @@ router.post("/", upload.single("file"), async (req, res) => {
       userMessage: message,
       date,
       time,
+      userID,
       fileUrl: req.file ? req.file.path : null, // Save relative path for file
     };
 
