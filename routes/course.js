@@ -15,11 +15,23 @@ router.get("/", async (req, res) => {
 // Get a single course by ID
 router.get("/:id", async (req, res) => {
   try {
+    // Find the course by its custom id
     const course = await Course.findOne({ id: req.params.id });
+
     if (!course) {
       return res.status(404).json({ message: "Course not found!" });
     }
-    res.status(200).json(course);
+
+    // Log or return all course ids (Optional step)
+    const allCourses = await Course.find();
+    const allCourseIds = allCourses.map((course) => course.id); // Extracting the `id` field from all courses
+
+    // Send the selected course and all course ids in the response
+    res.status(200).json({
+      selectedCourseId: course.id, // Selected course's ID
+      allCourseIds: allCourseIds, // All course IDs
+      course: course, // The course details
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching course", error });
   }
