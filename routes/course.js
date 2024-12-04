@@ -26,11 +26,15 @@ router.post("/", async (req, res) => {
       title,
       rating,
       lecturer,
-      email: emails.split(",").map((email) => email.trim()), // Convert comma-separated string to array
+      email: Array.isArray(emails) // Check if emails is already an array
+        ? emails.map((email) => email.trim())
+        : emails.split(",").map((email) => email.trim()),
       description,
       img,
       category,
-      topics: topics.split(",").map((topic) => topic.trim()), // Convert comma-separated string to array
+      topics: Array.isArray(topics) // Check if topics is already an array
+        ? topics.map((topic) => topic.trim())
+        : topics.split(",").map((topic) => topic.trim()),
     });
 
     await course.save();
