@@ -11,28 +11,22 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch courses" });
   }
 });
-
-// Get a single course by ID
 router.get("/:id", async (req, res) => {
   try {
-    // Find the course by its custom id
+    // Log the received `id` from the URL
+    console.log("Received ID:", req.params.id);
+
+    // Find the course by the received `id`
     const course = await Course.findOne({ id: req.params.id });
 
     if (!course) {
       return res.status(404).json({ message: "Course not found!" });
     }
 
-    // Log or return all course ids (Optional step)
-    const allCourses = await Course.find();
-    const allCourseIds = allCourses.map((course) => course.id); // Extracting the `id` field from all courses
-
-    // Send the selected course and all course ids in the response
-    res.status(200).json({
-      selectedCourseId: course.id, // Selected course's ID
-      allCourseIds: allCourseIds, // All course IDs
-      course: course, // The course details
-    });
+    // Return the course details
+    res.status(200).json(course);
   } catch (error) {
+    console.error("Error fetching course:", error);
     res.status(500).json({ message: "Error fetching course", error });
   }
 });
