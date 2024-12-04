@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const CourseSchema = new mongoose.Schema({
+  id: new Date().getTime().toString(),
   title: { type: String, required: true },
   rating: { type: Number, required: true },
   lecturer: { type: String, required: true },
