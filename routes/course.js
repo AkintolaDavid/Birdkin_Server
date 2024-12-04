@@ -1,7 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course");
-
+router.get("/", async (req, res) => {
+  try {
+    const courses = await Course.find();
+    res.status(200).json(courses);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch courses" });
+  }
+});
 // Create a new course
 router.post("/", async (req, res) => {
   const {
