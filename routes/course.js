@@ -2,20 +2,35 @@ const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course");
 
+// Create a new course
 router.post("/", async (req, res) => {
-  const { title, rating, lecturer, email, description, img, category, topics } =
-    req.body;
+  const {
+    title,
+    rating,
+    lecturer,
+    emails,
+    description,
+    img,
+    category,
+    topics,
+  } = req.body;
+
+  if (!title || !rating || !lecturer || !emails || !category || !topics) {
+    return res
+      .status(400)
+      .json({ message: "All required fields must be filled!" });
+  }
 
   try {
     const course = new Course({
       title,
       rating,
       lecturer,
-      email, // This email will now correspond to the selected tutor
+      email: emails.split(",").map((email) => email.trim()), // Convert comma-separated string to array
       description,
       img,
       category,
-      topics,
+      topics: topics.split(",").map((topic) => topic.trim()), // Convert comma-separated string to array
     });
 
     await course.save();

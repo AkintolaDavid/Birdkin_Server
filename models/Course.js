@@ -1,15 +1,38 @@
 const mongoose = require("mongoose");
 
-const courseSchema = new mongoose.Schema({
-  id: { type: Number, unique: true, autoIncrement: true },
-  title: { type: String, required: true },
-  rating: { type: Number, default: 0 },
-  lecturer: { type: String, required: true },
-  email: { type: String, required: true },
-  description: { type: String, required: true },
-  img: { type: String },
-  category: { type: String, required: true },
-  topics: { type: [String], required: true },
+const CourseSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  rating: {
+    type: Number,
+    required: true,
+    min: 0,
+    max: 5,
+  },
+  lecturer: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: [String], // Store multiple tutor emails as an array of strings
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  img: {
+    type: String,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  topics: {
+    type: [String], // Store topics as an array of strings
+    required: true,
+  },
 });
 
-module.exports = mongoose.model("Course", courseSchema);
+module.exports = mongoose.model("Course", CourseSchema);

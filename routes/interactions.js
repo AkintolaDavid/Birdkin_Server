@@ -2,7 +2,9 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const mongoose = require("mongoose");
-const Message = require("../models/UserMessage"); // Correct import path for your schema
+const nodemailer = require("nodemailer");
+const Message = require("../models/UserMessage");
+const Course = require("../models/Course"); // Assuming you have a Course model
 
 const router = express.Router();
 
@@ -19,8 +21,17 @@ const upload = multer({
   },
 });
 
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 router.post("/", upload.single("file"), async (req, res) => {
-  const { message, courseName, file, date, time, userId } = req.body;
+  const { message, courseName, date, time, userId } = req.body;
 
   // Validate required fields
   if (!message || !courseName || !date || !time) {
@@ -28,9 +39,24 @@ router.post("/", upload.single("file"), async (req, res) => {
   }
 
   try {
-    // Construct interaction data with courseName instead of courseId
+    // Find the course by name and get its tutors' emails
+    const course = await Course.findOne({ title: courseName });
+
+    if (!course) {
+      return res.status(404).json({ message: "Course not found." });
+    }
+
+    const tutorEmails = course.email; // Assuming `email` is an array of tutor emails
+
+    if (!tutorEmails || tutorEmails.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No tutors found for this course." });
+    }
+
+    // Construct interaction data
     const interactionData = {
-      courseName, // Save courseName directly
+      courseName,
       userMessage: message,
       date,
       time,
@@ -41,13 +67,34 @@ router.post("/", upload.single("file"), async (req, res) => {
     // Save to MongoDB
     const savedMessage = await Message.create(interactionData);
 
+    // Send email to tutors
+    const mailOptions = {
+      from: "your-email@example.com", // Your email
+      to: tutorEmails, // Send to all tutor emails
+      subject: `New Message for Course: ${courseName}`,
+      text: `A student has sent the following message:\n\n${message}\n\nDate: ${date}\nTime: ${time}`,
+      attachments: req.file
+        ? [
+            {
+              filename: req.file.originalname,
+              path: req.file.path,
+            },
+          ]
+        : [],
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+
     res.status(201).json({
-      message: "Interaction submitted successfully!",
+      message: "Interaction submitted and emails sent successfully!",
       savedMessage,
     });
   } catch (error) {
-    console.error("Error saving interaction:", error);
-    res.status(500).json({ message: "Failed to save interaction." });
+    console.error("Error saving interaction or sending emails:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to save interaction or send emails." });
   }
 });
 
