@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 // Get a single course by ID
 router.get("/:id", async (req, res) => {
   try {
-    const course = await Course.findOne({ _id: req.params.id });
+    const course = await Course.findOne({ id: req.params.id });
     if (!course) {
       return res.status(404).json({ message: "Course not found!" });
     }
