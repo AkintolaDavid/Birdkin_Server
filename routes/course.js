@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course");
+
+// Get all courses
 router.get("/", async (req, res) => {
   try {
     const courses = await Course.find();
@@ -9,6 +11,20 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch courses" });
   }
 });
+
+// Get a single course by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const course = await Course.findOne({ _id: req.params.id });
+    if (!course) {
+      return res.status(404).json({ message: "Course not found!" });
+    }
+    res.status(200).json(course);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching course", error });
+  }
+});
+
 // Create a new course
 router.post("/", async (req, res) => {
   const {
@@ -33,13 +49,13 @@ router.post("/", async (req, res) => {
       title,
       rating,
       lecturer,
-      email: Array.isArray(emails) // Check if emails is already an array
+      email: Array.isArray(emails)
         ? emails.map((email) => email.trim())
         : emails.split(",").map((email) => email.trim()),
       description,
       img,
       category,
-      topics: Array.isArray(topics) // Check if topics is already an array
+      topics: Array.isArray(topics)
         ? topics.map((topic) => topic.trim())
         : topics.split(",").map((topic) => topic.trim()),
     });
