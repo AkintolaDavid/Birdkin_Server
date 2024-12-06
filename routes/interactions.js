@@ -29,6 +29,18 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+router.get("/messages", async (req, res) => {
+  try {
+    const messages = await Message.find()
+      .populate("userId", "name email") // Populate user details (optional)
+      .select("courseName date userMessage"); // Only include specific fields
+
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ message: "Failed to fetch messages." });
+  }
+});
 
 router.post("/", upload.single("file"), async (req, res) => {
   const { message, courseName, date, time, userId } = req.body;
