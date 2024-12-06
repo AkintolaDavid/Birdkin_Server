@@ -41,6 +41,33 @@ router.get("/messages", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch messages." });
   }
 });
+router.patch("/messages/:id/reply", async (req, res) => {
+  const { id } = req.params;
+  const { reply } = req.body;
+
+  if (!reply) {
+    return res.status(400).json({ message: "Reply content is required." });
+  }
+
+  try {
+    const updatedMessage = await Message.findByIdAndUpdate(
+      id,
+      { reply },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedMessage) {
+      return res.status(404).json({ message: "Message not found." });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Reply added successfully!", updatedMessage });
+  } catch (error) {
+    console.error("Error updating reply:", error);
+    res.status(500).json({ message: "Failed to add reply." });
+  }
+});
 
 router.post("/", upload.single("file"), async (req, res) => {
   const { message, courseName, date, time, userId } = req.body;
