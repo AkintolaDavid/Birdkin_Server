@@ -33,8 +33,7 @@ router.get("/messages", async (req, res) => {
   try {
     const messages = await Message.find()
       .populate("userId", "name email") // Populate user details (optional)
-      .select("courseName date userMessage"); // Only include specific fields
-
+      .select("courseName date userMessage replies");
     res.status(200).json(messages);
   } catch (error) {
     console.error("Error fetching messages:", error);
