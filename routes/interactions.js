@@ -52,7 +52,7 @@ router.patch("/messages/:id/reply", async (req, res) => {
   try {
     const updatedMessage = await Message.findByIdAndUpdate(
       id,
-      { reply },
+      { $push: { replies: reply } }, // Append the new reply
       { new: true } // Return the updated document
     );
 
