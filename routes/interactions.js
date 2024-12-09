@@ -48,17 +48,18 @@ router.get("/messages", async (req, res) => {
 });
 router.get("/messagestutor", async (req, res) => {
   try {
-    const tutorEmail = req.headers.authorization?.split(" ")[1]; // Extract tutor email from Authorization header
+    const tutorEmail = req.query.tutoremail; // Extract tutor email from query parameters
 
     if (!tutorEmail) {
       return res.status(400).json({ message: "Tutor email is required." });
     }
 
-    // Search for messages that belong to the courses the tutor teaches
+    console.log("Received tutor email:", tutorEmail); // Log the email to check
+    // Fetch messages as before
     const messages = await Message.find({
-      "courseName.tutorEmail": tutorEmail, // Assuming courseName includes the tutor's email field
+      "courseName.tutorEmail": tutorEmail,
     })
-      .populate("userId", "name email") // Optional: Include user details
+      .populate("userId", "name email")
       .select("courseName date userMessage replies");
 
     if (messages.length === 0) {
@@ -73,6 +74,7 @@ router.get("/messagestutor", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch messages." });
   }
 });
+
 // ** PATCH /messages/:id/reply **: Add a reply to a message
 router.patch("/messages/:id/reply", async (req, res) => {
   const { id } = req.params;
