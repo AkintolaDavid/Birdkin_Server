@@ -58,10 +58,12 @@ router.get("/messagestutor", async (req, res) => {
     console.log("Received tutor email:", tutorEmail); // Log the email to check
 
     // Step 1: Fetch the course using the tutor's email
-    console.log(Course);
     const course = await Course.findOne({
-      email: tutorEmail, // Match the tutor's email in the course's email array
+      email: tutorEmail.trim(), // Ensure no leading or trailing spaces
     });
+
+    // Log the entire course object to understand its structure
+    console.log("Found course object:", course);
 
     if (!course) {
       return res
@@ -70,6 +72,7 @@ router.get("/messagestutor", async (req, res) => {
     }
 
     console.log("Found course for tutor:", course.title); // Log the found course title
+    console.log("Course emails:", course.email); // Log all email addresses in the course
 
     // Step 2: Fetch the messages for the course name
     const messages = await Message.find({
