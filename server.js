@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 5000;
 // Middleware to parse JSON requests
 app.use(express.json());
 const corsOptions = {
-  origin: "http://localhost:5173", // Replace with your frontend URL in production
+  origin: ["http://localhost:5173", "https://birdkins.vercel.app"], // Replace with your frontend URL in production
   methods: "GET,POST,PUT,DELETE,PATCH",
   allowedHeaders: "Content-Type,Authorization",
 };
