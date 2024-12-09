@@ -49,17 +49,19 @@ router.get("/messages", async (req, res) => {
 
 router.get("/messagestutor", async (req, res) => {
   try {
-    const tutorEmail = req.query.tutoremail; // Extract tutor email from query parameters
+    let tutorEmail = req.query.tutoremail;
 
     if (!tutorEmail) {
       return res.status(400).json({ message: "Tutor email is required." });
     }
 
-    console.log("Received tutor email:", tutorEmail); // Log the email to check
+    tutorEmail = tutorEmail.replace(/\s+/g, ""); // Remove any spaces from email
 
-    // Step 1: Fetch the course using the tutor's email
+    console.log("Received tutor email after cleaning:", tutorEmail);
+
+    // Query to find the course based on the tutor's email
     const course = await Course.findOne({
-      email: tutorEmail.trim(), // Ensure no leading or trailing spaces
+      email: { $in: [tutorEmail] }, // Match any email in the array
     });
 
     // Log the entire course object to understand its structure
@@ -72,9 +74,8 @@ router.get("/messagestutor", async (req, res) => {
     }
 
     console.log("Found course for tutor:", course.title); // Log the found course title
-    console.log("Course emails:", course.email); // Log all email addresses in the course
 
-    // Step 2: Fetch the messages for the course name
+    // Fetch the messages for the course name
     const messages = await Message.find({
       courseName: course.title, // Use the course title to find related messages
     })
