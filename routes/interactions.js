@@ -48,29 +48,44 @@ router.get("/messages", async (req, res) => {
 });
 router.get("/messagestutor", async (req, res) => {
   try {
-    const tutorEmail = req.query.tutoremail; // Extract tutor email from query parameters
+    // Extract tutor email from query, body, or headers (depending on method used)
+    const tutorEmail =
+      req.query.tutoremail ||
+      req.body.tutoremail ||
+      req.headers.authorization?.split(" ")[1];
+
+    console.log("Received tutor email:", tutorEmail); // Log the email being received
 
     if (!tutorEmail) {
+      console.log("Tutor email is missing.");
       return res.status(400).json({ message: "Tutor email is required." });
     }
 
-    console.log("Received tutor email:", tutorEmail); // Log the email to check
-    // Fetch messages as before
+    // Log message querying process
+    console.log("Querying messages for tutor with email:", tutorEmail);
+
+    // Fetch messages where the tutorEmail matches in the courseName
     const messages = await Message.find({
       "courseName.tutorEmail": tutorEmail,
     })
-      .populate("userId", "name email")
-      .select("courseName date userMessage replies");
+      .populate("userId", "name email") // Include user details in the result
+      .select("courseName date userMessage replies"); // Select the required fields
+
+    // Log the fetched messages
+    console.log("Fetched messages:", messages);
 
     if (messages.length === 0) {
+      console.log("No messages found for this tutor.");
       return res
         .status(404)
         .json({ message: "No messages found for this tutor." });
     }
 
+    // If there are messages, log the successful response
+    console.log("Messages found, sending response.");
     res.status(200).json(messages);
   } catch (error) {
-    console.error("Error fetching messages:", error);
+    console.error("Error fetching messages:", error); // Log the error if any
     res.status(500).json({ message: "Failed to fetch messages." });
   }
 });
