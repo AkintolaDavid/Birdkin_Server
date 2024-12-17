@@ -5,7 +5,7 @@ const authRoutes = require("./routes/auth");
 const courseRoutes = require("./routes/course");
 const interactionRoutes = require("./routes/interactions");
 const tutorRoutes = require("./routes/tutor");
-const donationRoutes = require("./routes/donationRoutess");
+const donationRoutes = require("./routes/donationRoutes");
 
 const cors = require("cors");
 // Load environment variables from .env
