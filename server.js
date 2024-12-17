@@ -5,6 +5,8 @@ const authRoutes = require("./routes/auth");
 const courseRoutes = require("./routes/course");
 const interactionRoutes = require("./routes/interactions");
 const tutorRoutes = require("./routes/tutor");
+const donationRoutes = require("./routes/donationRoutess");
+
 const cors = require("cors");
 // Load environment variables from .env
 dotenv.config();
@@ -30,6 +32,7 @@ app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/courses", courseRoutes);
 app.use("/api/interactions", interactionRoutes);
 app.use("/api/tutors", tutorRoutes);
+app.use("/api/donations", donationRoutes);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
