@@ -6,7 +6,7 @@ const courseRoutes = require("./routes/course");
 const interactionRoutes = require("./routes/interactions");
 const tutorRoutes = require("./routes/tutor");
 const donationRoutes = require("./routes/donationRoutes");
-
+const contactRoutes = require("./routes/contact");
 const cors = require("cors");
 // Load environment variables from .env
 dotenv.config();
@@ -33,6 +33,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/interactions", interactionRoutes);
 app.use("/api/tutors", tutorRoutes);
 app.use("/api/donations", donationRoutes);
+app.use("/api/contact", contactRoutes);
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

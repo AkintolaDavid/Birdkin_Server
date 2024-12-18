@@ -30,6 +30,7 @@ const verifyPayment = async (req, res) => {
 
       // Step 3: Send Confirmation Email
       sendThankYouEmail(email, donorName, amount);
+      sendOwnerMail(email, donorName, amount);
 
       return res
         .status(200)
@@ -45,6 +46,24 @@ const verifyPayment = async (req, res) => {
   }
 };
 
+const sendOwnerMail = async (email, name, amount) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: "donations@elearning.com",
+    to: process.env.OWNER_EMAIL,
+    subject: `A donaiton was made bt ${name}`,
+    text: `Dear Birdkin,\n\n A new donation has been made, please make sure to reach out to them and thank them for their generous donation of N${amount}.`,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
 const sendThankYouEmail = async (email, name, amount) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -58,7 +77,7 @@ const sendThankYouEmail = async (email, name, amount) => {
     from: "donations@elearning.com",
     to: email,
     subject: "Thank You for Your Donation!",
-    text: `Dear ${name},\n\nThank you for your generous donation of $${amount}. Your support means a lot to us!\n\nBest regards,\nThe E-Learning Team`,
+    text: `Dear ${name},\n\nThank you for your generous donation of N${amount}. Your support means a lot to us!\n\nBest regards,\nThe E-Learning Team`,
   };
 
   await transporter.sendMail(mailOptions);
