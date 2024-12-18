@@ -39,7 +39,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD, // Your email password or app password
   },
 });
-
 // Create a new course
 router.post("/", async (req, res) => {
   const {
@@ -53,21 +52,43 @@ router.post("/", async (req, res) => {
     topics,
   } = req.body;
 
-  if (!title || !rating || !lecturer || !emails || !category || !topics) {
+  if (
+    !title ||
+    !rating ||
+    !lecturer ||
+    !emails ||
+    !category ||
+    !topics ||
+    !img
+  ) {
     return res
       .status(400)
       .json({ message: "All required fields must be filled!" });
   }
 
+  // Validate emails input
+  if (!Array.isArray(emails) && typeof emails !== "string") {
+    return res
+      .status(400)
+      .json({
+        message: "Emails must be an array or a comma-separated string!",
+      });
+  }
+
   try {
+    // Normalize emails to always be an array
+    const normalizedEmails = Array.isArray(emails)
+      ? emails.map((email) => email.trim())
+      : typeof emails === "string"
+      ? emails.split(",").map((email) => email.trim())
+      : [];
+
     // Save the course in the database
     const course = new Course({
       title,
       rating,
       lecturer,
-      email: Array.isArray(emails)
-        ? emails.map((email) => email.trim())
-        : emails.split(",").map((email) => email.trim()),
+      email: normalizedEmails,
       description,
       img,
       category,
@@ -79,7 +100,7 @@ router.post("/", async (req, res) => {
     await course.save();
 
     // Send email notifications
-    const emailPromises = emails.map((email) => {
+    const emailPromises = normalizedEmails.map((email) => {
       return transporter.sendMail({
         from: `"Birdkins Admin" <${process.env.EMAIL}>`, // Sender address
         to: email, // Recipient address
