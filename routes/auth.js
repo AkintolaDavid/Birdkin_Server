@@ -236,10 +236,15 @@ router.post("/login", async (req, res) => {
         message: "Account not verified. Use forget passward to verify",
       });
     }
+    const tokenPayload = {
+      id: user._id,
+      email: user.email,
+      role: "user", // Assign user role here
+    };
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+    // Generate the JWT
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token valid for 1 hour
     });
 
     // Return success response
@@ -250,6 +255,7 @@ router.post("/login", async (req, res) => {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -280,9 +286,15 @@ router.post("/logintutor", async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ tutorId: tutor._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+    const tokenPayload = {
+      id: tutor._id,
+      email: tutor.email,
+      role: "user", // Assign user role here
+    };
+
+    // Generate the JWT
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token valid for 1 hour
     });
 
     // Return success response
@@ -293,6 +305,7 @@ router.post("/logintutor", async (req, res) => {
         id: tutor._id,
         email: tutor.email,
         fullName: tutor.fullName,
+        role: tutor.role,
       },
     });
   } catch (error) {

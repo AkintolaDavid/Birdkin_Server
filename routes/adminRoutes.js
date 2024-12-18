@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 const Otp = require("../models/Otp");
 require("dotenv").config();
 
@@ -53,11 +54,21 @@ router.post("/verify-otp", async (req, res) => {
     if (!otpRecord) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
+    const tokenPayload = {
+      id: user._id,
+      email: user.email,
+      role: "admin", // Assign user role here
+    };
+
+    // Generate the JWT
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token valid for 1 hour
+    });
 
     // Delete OTP after verification
     await Otp.deleteOne({ _id: otpRecord._id });
 
-    res.status(200).json({ message: "OTP verified successfully" });
+    res.status(200).json({ message: "OTP verified successfully", token });
   } catch (error) {
     res
       .status(500)
