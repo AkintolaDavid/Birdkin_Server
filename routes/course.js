@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
     const courses = await Course.find();
     res.status(200).json(courses);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch courses" });
+    res.status(500).json({ error: "failed to fetch courses" });
   }
 });
 router.get("/:id", async (req, res) => {
