@@ -9,7 +9,7 @@ const ContactSchema = new mongoose.Schema({
   },
   name: { type: String, required: true }, // Name of the person
   email: { type: String, required: true }, // Email of the person
-  number: { type: String, required: true }, // Phone number
+  number: { type: Number, required: true }, // Phone number
   message: { type: String, required: true }, // Message content
   date: { type: Date, default: Date.now }, // Timestamp for when the message was sent
 });
