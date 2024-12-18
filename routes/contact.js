@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const Contact = require("../models/Contact");
+
 const sendOwnerMail = async (name, email, number, message) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -15,21 +15,22 @@ const sendOwnerMail = async (name, email, number, message) => {
   const mailOptions = {
     from: "donations@elearning.com",
     to: process.env.OWNER_EMAIL,
-    subject: `A contact message was sent ny ${name}`,
-    text: `Dear Birdkin you have a new message,\n\n from: ${email} /n phone :${phone} /n message:${message}.`,
+    subject: `A contact message was sent by ${name}`,
+    text: `Dear Birdkin,\n\nYou have a new message:\n\nFrom: ${email}\nPhone: ${number}\nMessage: ${message}`,
   };
 
   await transporter.sendMail(mailOptions);
 };
-router.use(bodyParser.json());
+
 router.get("/", async (req, res) => {
   try {
     const contacts = await Contact.find();
     res.status(200).json(contacts);
   } catch (error) {
-    res.status(500).json({ error: "failed to fetch contact" });
+    res.status(500).json({ error: "Failed to fetch contacts." });
   }
 });
+
 router.post("/", async (req, res) => {
   const { name, email, number, message } = req.body;
 
@@ -38,6 +39,7 @@ router.post("/", async (req, res) => {
       .status(400)
       .json({ message: "Please provide all required fields." });
   }
+
   try {
     const newContact = new Contact({ name, email, number, message });
     await newContact.save();
