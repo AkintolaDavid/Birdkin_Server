@@ -35,8 +35,8 @@ router.get("/:id", async (req, res) => {
 const transporter = nodemailer.createTransport({
   service: "gmail", // Change if you're not using Gmail
   auth: {
-    user: process.env.EMAIL, // Your email
-    pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+    user: process.env.EMAIL_USER, // Your email
+    pass: process.env.EMAIL_PASS, // Your email password or app password
   },
 });
 // Create a new course
@@ -68,11 +68,9 @@ router.post("/", async (req, res) => {
 
   // Validate emails input
   if (!Array.isArray(emails) && typeof emails !== "string") {
-    return res
-      .status(400)
-      .json({
-        message: "Emails must be an array or a comma-separated string!",
-      });
+    return res.status(400).json({
+      message: "Emails must be an array or a comma-separated string!",
+    });
   }
 
   try {
@@ -102,7 +100,7 @@ router.post("/", async (req, res) => {
     // Send email notifications
     const emailPromises = normalizedEmails.map((email) => {
       return transporter.sendMail({
-        from: `"Birdkins Admin" <${process.env.EMAIL}>`, // Sender address
+        from: `"Birdkins Admin" <${process.env.OWNER_EMAIL}>`, // Sender address
         to: email, // Recipient address
         subject: "New Course Assignment Notification", // Subject
         text: `Hello, you have been added as a tutor for the course "${title}" by Birdkins Admin.`, // Plain text body
