@@ -55,8 +55,8 @@ router.post("/verify-otp", async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
     const tokenPayload = {
-      id: user._id,
-      email: user.email,
+      id: _id,
+      email: email,
       role: "admin", // Assign user role here
     };
 
