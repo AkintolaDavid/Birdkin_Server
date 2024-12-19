@@ -255,7 +255,7 @@ router.post("/login", async (req, res) => {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
-        role: user.role,
+        role: tokenPayload.role,
       },
     });
   } catch (error) {
@@ -305,7 +305,7 @@ router.post("/logintutor", async (req, res) => {
         id: tutor._id,
         email: tutor.email,
         fullName: tutor.fullName,
-        role: tutor.role,
+        role: tokenPayload.role,
       },
     });
   } catch (error) {

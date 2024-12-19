@@ -68,7 +68,13 @@ router.post("/verify-otp", async (req, res) => {
     // Delete OTP after verification
     await Otp.deleteOne({ _id: otpRecord._id });
 
-    res.status(200).json({ message: "OTP verified successfully", token });
+    res.status(200).json({
+      message: "OTP verified successfully",
+      token,
+      admin: {
+        role: tokenPayload.role,
+      },
+    });
   } catch (error) {
     res
       .status(500)
