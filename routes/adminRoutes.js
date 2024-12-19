@@ -17,8 +17,9 @@ router.post("/send-otp", async (req, res) => {
   const otp = crypto.randomInt(100000, 999999).toString();
 
   try {
-    // Save OTP to the database
-    await Otp.create({ email, otp });
+    // Save OTP to the database with expiration (5 minutes)
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+    await Otp.create({ email, otp, expiresAt });
 
     // Send email with OTP
     const transporter = nodemailer.createTransport({
@@ -33,7 +34,7 @@ router.post("/send-otp", async (req, res) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Your Admin OTP",
-      text: `Your OTP is: ${otp}`,
+      text: `Your OTP is: ${otp}. It expires in 5 minutes.`,
     });
 
     res.status(200).json({ message: "OTP sent successfully" });
@@ -54,18 +55,25 @@ router.post("/verify-otp", async (req, res) => {
     if (!otpRecord) {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
-    const tokenPayload = {
-      id: _id,
-      email: email,
-      role: "admin", // Assign user role here
-    };
+
+    // Check OTP expiration
+    if (new Date() > otpRecord.expiresAt) {
+      await Otp.deleteOne({ _id: otpRecord._id });
+      return res.status(400).json({ message: "OTP has expired" });
+    }
 
     // Generate the JWT
+    const tokenPayload = {
+      id: email, // Using email as a unique ID for admin
+      email,
+      role: "admin", // Assign admin role
+    };
+
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: "1h", // Token valid for 1 hour
     });
 
-    // Delete OTP after verification
+    // Delete OTP after successful verification
     await Otp.deleteOne({ _id: otpRecord._id });
 
     res.status(200).json({
