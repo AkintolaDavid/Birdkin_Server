@@ -31,7 +31,7 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   }
 });
 
-router.post("/", verifyTokenForAdminOrUser, async (req, res) => {
+router.post("/", async (req, res) => {
   const { name, email, number, message } = req.body;
 
   if (!name || !email || !number || !message) {
