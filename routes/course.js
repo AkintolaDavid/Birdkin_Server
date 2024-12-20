@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course");
 const nodemailer = require("nodemailer");
+const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
 
 // Get all courses
-router.get("/", async (req, res) => {
+router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
   try {
     const courses = await Course.find();
     res.status(200).json(courses);
