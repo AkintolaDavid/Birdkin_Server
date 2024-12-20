@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Tutor = require("../models/Tutor");
-const verifyAdminToken = require("../middleware/verifyAdminToken");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
 // Endpoint to get all tutor emails
 router.get("/", verifyAdminToken, async (req, res) => {
   try {
