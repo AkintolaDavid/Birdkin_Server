@@ -5,8 +5,7 @@ const Course = require("../models/Course"); // Assuming you have a Course model
 const nodemailer = require("nodemailer");
 
 const router = express.Router();
-const verifyUserToken = require("../middleware/verifyUserToken ");
-const verifyAdminToken = require("../middleware/verifyAdminToken ");
+const verifyUserToken = require("../middleware/verifyUserToken");
 // Multer configuration for file uploads
 const upload = multer({
   dest: "uploads/",
