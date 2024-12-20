@@ -4,7 +4,7 @@ const Course = require("../models/Course");
 const nodemailer = require("nodemailer");
 const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
 const verifyUserToken = require("../middleware/verifyUserToken");
-const verifyAdminToken = require("../middleware/verifyAdminToken");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
 
 // Get all courses
 router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
