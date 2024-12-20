@@ -5,7 +5,8 @@ const Course = require("../models/Course"); // Assuming you have a Course model
 const nodemailer = require("nodemailer");
 
 const router = express.Router();
-
+const verifyUserToken = require("../middleware/verifyUserToken ");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
 // Multer configuration for file uploads
 const upload = multer({
   dest: "uploads/",
@@ -47,7 +48,7 @@ router.get("/messages", async (req, res) => {
   }
 });
 
-router.get("/messagestutor", async (req, res) => {
+router.get("/messagestutor", verifyUserToken, async (req, res) => {
   try {
     let tutorEmail = req.query.tutoremail;
 
@@ -96,7 +97,7 @@ router.get("/messagestutor", async (req, res) => {
 });
 
 // ** PATCH /messages/:id/reply **: Add a reply to a message
-router.patch("/messages/:id/reply", async (req, res) => {
+router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
   const { id } = req.params;
   const { reply } = req.body;
 
@@ -125,7 +126,7 @@ router.patch("/messages/:id/reply", async (req, res) => {
 });
 
 // ** POST /messages **: Submit a new message
-router.post("/", upload.single("file"), async (req, res) => {
+router.post("/", verifyUserToken, upload.single("file"), async (req, res) => {
   const { message, courseName, date, time, userId } = req.body;
 
   if (!message || !courseName || !date || !time || !userId) {

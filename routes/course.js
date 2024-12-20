@@ -3,6 +3,8 @@ const router = express.Router();
 const Course = require("../models/Course");
 const nodemailer = require("nodemailer");
 const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
+const verifyUserToken = require("../middleware/verifyUserToken");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
 
 // Get all courses
 router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
@@ -13,7 +15,7 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
     res.status(500).json({ error: "failed to fetch courses" });
   }
 });
-router.get("/:id", async (req, res) => {
+router.get("/:id", verifyUserToken, async (req, res) => {
   try {
     // Log the received `id` from the URL
     console.log("Received ID:", req.params.id);
@@ -41,7 +43,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 // Create a new course
-router.post("/", async (req, res) => {
+router.post("/", verifyAdminToken, async (req, res) => {
   const {
     title,
     rating,
