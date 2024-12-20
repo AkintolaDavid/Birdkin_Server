@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const verifyAdminToken = require("../middleware/verifyAdminToken ");
-// Get all courses
-const verifyAdminToken = require("../middleware/verifyAdminToken ");
+const verifyAdminToken = require("../middleware/verifyAdminToken");
 router.get("/", verifyAdminToken, async (req, res) => {
   try {
     const users = await User.find();
