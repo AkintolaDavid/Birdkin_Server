@@ -2,8 +2,8 @@ const express = require("express");
 const { verifyPayment } = require("../controllers/donationController");
 const Donation = require("../models/Donation");
 const router = express.Router();
-const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
-router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
+router.get("/", verifyAdminToken, async (req, res) => {
   try {
     const donations = await Donation.find();
     res.status(200).json(donations);
@@ -11,6 +11,6 @@ router.get("/", verifyTokenForAdminOrUser, async (req, res) => {
     res.status(500).json({ error: "failed to fetch Donation" });
   }
 });
-router.post("/verify-payment", verifyTokenForAdminOrUser, verifyPayment);
+router.post("/verify-payment", verifyAdminToken, verifyPayment);
 
 module.exports = router;
