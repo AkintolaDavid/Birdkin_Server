@@ -3,6 +3,7 @@ const router = express.Router();
 const nodemailer = require("nodemailer");
 const Contact = require("../models/Contact");
 const verifyTokenForAdminOrUser = require("../middleware/verifyTokenForAdminOrUser");
+const verifyAdminToken = require("../middleware/verifyAdminToken ");
 const sendOwnerMail = async (name, email, number, message) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
