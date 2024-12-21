@@ -38,11 +38,11 @@ router.delete("/:id", verifyAdminToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-    await User.findByIdAndDelete(id);
-    res.status(200).json({ message: "user deleted successfully." });
+    await Course.findByIdAndDelete(id);
+    res.status(200).json({ message: "Course deleted successfully." });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Failed to delete user." });
+    console.error("Error deleting Course:", error);
+    res.status(500).json({ error: "Failed to delete Course." });
   }
 });
 const transporter = nodemailer.createTransport({
