@@ -53,5 +53,15 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to save contact to the database." });
   }
 });
+router.delete("/:id", verifyAdminToken, async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    await Contact.findByIdAndDelete(id);
+    res.status(200).json({ message: "Contact deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting Contact:", error);
+    res.status(500).json({ error: "Failed to delete Contact." });
+  }
+});
 module.exports = router;

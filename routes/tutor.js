@@ -15,11 +15,11 @@ router.delete("/:id", verifyAdminToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-    await User.findByIdAndDelete(id);
-    res.status(200).json({ message: "user deleted successfully." });
+    await Tutor.findByIdAndDelete(id);
+    res.status(200).json({ message: "Tutor deleted successfully." });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Failed to delete user." });
+    console.error("Error deleting Tutor:", error);
+    res.status(500).json({ error: "Failed to delete Tutor." });
   }
 });
 module.exports = router;
