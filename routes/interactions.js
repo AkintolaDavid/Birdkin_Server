@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // ** GET /messages **: Fetch messages for a specific user
-router.get("/messages", async (req, res) => {
+router.get("/messages", verifyUserToken, async (req, res) => {
   const { userId } = req.query;
 
   if (!userId) {

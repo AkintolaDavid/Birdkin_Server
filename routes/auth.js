@@ -161,7 +161,7 @@ router.post("/verify-otp", async (req, res) => {
 
     // OTP is valid, generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "3h",
     });
 
     // Mark the user as verified and clear OTP data
@@ -197,7 +197,7 @@ router.post("/verify-otptutor", async (req, res) => {
 
     // OTP is valid, generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "3h",
     });
 
     // Mark the user as verified and clear OTP data
@@ -244,7 +244,7 @@ router.post("/login", async (req, res) => {
 
     // Generate the JWT
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token valid for 1 hour
+      expiresIn: "3h", // Token valid for 1 hour
     });
 
     // Return success response
@@ -294,7 +294,7 @@ router.post("/logintutor", async (req, res) => {
 
     // Generate the JWT
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token valid for 1 hour
+      expiresIn: "3h", // Token valid for 1 hour
     });
 
     // Return success response
@@ -429,7 +429,7 @@ router.post("/verifyOtp", async (req, res) => {
 
     // OTP is valid; generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token validity
+      expiresIn: "3h", // Token validity
     });
 
     // Update user: mark as verified and clear OTP fields
@@ -475,7 +475,7 @@ router.post("/verifyOtpTutor", async (req, res) => {
 
     // OTP is valid; generate JWT token
     const token = jwt.sign({ tutorId: tutor._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token validity
+      expiresIn: "3h", // Token validity
     });
 
     // Update tutor: mark as verified and clear OTP fields
