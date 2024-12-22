@@ -296,7 +296,7 @@ router.post("/logintutor", async (req, res) => {
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: "3h", // Token valid for 1 hour
     });
-
+    console.log(token);
     // Return success response
     res.status(200).json({
       message: "Sign in successful",
