@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const verifyUserToken = (req, res, next) => {
+  console.log(req.headers.authorization);
   const token = req.headers.authorization?.split(" ")[1]; // Extract token from Bearer
 
   if (!token) {
