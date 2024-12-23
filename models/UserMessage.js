@@ -7,7 +7,10 @@ const messageSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   time: { type: String, required: true },
   fileUrl: { type: String },
-  replies: [{ type: String }], // Array of strings for multiple replies
+  replies: {
+    tutorReplies: [{ type: String }],
+    userReplies: [{ type: String }],
+  },
 });
 
 module.exports = mongoose.model("Message", messageSchema);
