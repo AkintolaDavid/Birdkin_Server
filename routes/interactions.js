@@ -98,16 +98,21 @@ router.get("/messagestutor", verifyUserToken, async (req, res) => {
 // ** PATCH /messages/:id/reply **: Add a reply to a message
 router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
   const { id } = req.params;
-  const { reply } = req.body;
+  const { reply, replyType } = req.body; // Extract `reply` and `replyType` from the body
 
-  if (!reply) {
-    return res.status(400).json({ message: "Reply content is required." });
+  if (!reply || !replyType) {
+    return res
+      .status(400)
+      .json({ message: "Reply and replyType are required." });
   }
 
   try {
+    console.log("Message ID:", id);
+    console.log("Reply Content:", reply);
+    console.log("Reply Type:", replyType);
     const updatedMessage = await Message.findByIdAndUpdate(
       id,
-      { $push: { replies: reply } },
+      { $push: { replies: { content: reply, type: replyType } } }, // Store reply and replyType
       { new: true }
     );
 
@@ -115,9 +120,10 @@ router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
       return res.status(404).json({ message: "Message not found." });
     }
 
-    res
-      .status(200)
-      .json({ message: "Reply added successfully!", updatedMessage });
+    res.status(200).json({
+      message: "Reply added successfully!",
+      updatedMessage,
+    });
   } catch (error) {
     console.error("Error updating reply:", error);
     res.status(500).json({ message: "Failed to add reply." });
