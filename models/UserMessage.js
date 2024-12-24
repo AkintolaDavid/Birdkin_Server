@@ -7,12 +7,15 @@ const messageSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   time: { type: String, required: true },
   fileUrl: { type: String },
-  replies: [
-    {
-      content: { type: String, required: true },
-      type: { type: String, required: true, enum: ["tutor", "user"] },
-    },
-  ],
+  replies: {
+    type: [
+      {
+        content: { type: String, required: true },
+        type: { type: String, required: true, enum: ["tutor", "user"] },
+      },
+    ],
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("Message", messageSchema);

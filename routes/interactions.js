@@ -98,7 +98,7 @@ router.get("/messagestutor", verifyUserToken, async (req, res) => {
 // ** PATCH /messages/:id/reply **: Add a reply to a message
 router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
   const { id } = req.params;
-  const { reply, replyType } = req.body; // Extract `reply` and `replyType` from the body
+  const { reply, replyType } = req.body;
 
   if (!reply || !replyType) {
     return res
@@ -107,22 +107,22 @@ router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
   }
 
   try {
-    console.log("Message ID:", id);
-    console.log("Reply Content:", reply);
-    console.log("Reply Type:", replyType);
-    const updatedMessage = await Message.findByIdAndUpdate(
-      id,
-      { $push: { replies: { content: reply, type: replyType } } }, // Store reply and replyType
-      { new: true }
-    );
+    const message = await Message.findById(id);
 
-    if (!updatedMessage) {
+    if (!message) {
       return res.status(404).json({ message: "Message not found." });
     }
 
+    if (!Array.isArray(message.replies)) {
+      message.replies = []; // Initialize replies as an array
+    }
+
+    message.replies.push({ content: reply, type: replyType });
+    await message.save();
+
     res.status(200).json({
       message: "Reply added successfully!",
-      updatedMessage,
+      updatedMessage: message,
     });
   } catch (error) {
     console.error("Error updating reply:", error);
