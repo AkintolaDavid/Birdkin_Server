@@ -114,10 +114,12 @@ router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
     }
 
     if (!Array.isArray(message.replies)) {
-      message.replies = []; // Initialize replies as an array
+      message.replies = []; // Initialize replies as an array if not already
     }
 
+    // Push reply to the replies array
     message.replies.push({ content: reply, type: replyType });
+
     await message.save();
 
     res.status(200).json({
