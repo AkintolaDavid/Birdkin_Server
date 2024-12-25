@@ -98,12 +98,12 @@ router.get("/messagestutor", verifyUserToken, async (req, res) => {
 // ** PATCH /messages/:id/reply **: Add a reply to a message
 router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
   const { id } = req.params;
-  const { reply, replyType } = req.body;
+  const { reply, replyType, sender } = req.body; // Include `sender` in the destructured body
 
-  if (!reply || !replyType) {
+  if (!reply || !replyType || !sender) {
     return res
       .status(400)
-      .json({ message: "Reply and replyType are required." });
+      .json({ message: "Reply, replyType, and sender are required." });
   }
 
   try {
@@ -118,7 +118,7 @@ router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
     }
 
     // Push reply to the replies array
-    message.replies.push({ content: reply, type: replyType });
+    message.replies.push({ content: reply, type: replyType, sender });
 
     await message.save();
 
