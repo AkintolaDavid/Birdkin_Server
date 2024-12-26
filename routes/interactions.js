@@ -131,6 +131,15 @@ router.patch("/messages/:id/reply", verifyUserToken, async (req, res) => {
     res.status(500).json({ message: "Failed to add reply." });
   }
 });
+router.delete("/messagesdelete/:id", verifyUserToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await Message.findByIdAndDelete(id);
+    res.json({ message: "Message deleted successfully." });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting message." });
+  }
+});
 
 // ** POST /messages **: Submit a new message
 router.post("/", verifyUserToken, upload.single("file"), async (req, res) => {
